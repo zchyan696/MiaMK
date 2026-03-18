@@ -309,7 +309,7 @@ function createDatasetService({ workbookPath }) {
       metric: options.metric || 'count',
       metricColumn: options.metricColumn || 'fluxo_de_passantes',
       limit: options._bypassLimit ? (Number(options.limit) || 100000) : Math.min(Math.max(Number(options.limit) || DEFAULT_LIMIT, 1), MAX_LIMIT),
-      sort: options.sort || { by: 'value', direction: 'desc' },
+      sort: { by: 'value', direction: 'desc' },
       select: Array.isArray(options.select) ? options.select : [],
     };
 
@@ -438,12 +438,28 @@ function createDatasetService({ workbookPath }) {
     };
   }
 
+  function countDistinct({ column, filters = [] } = {}) {
+    if (!column || !schema.some((item) => item.key === column)) {
+      throw new Error('Coluna inválida para contagem distinta.');
+    }
+
+    const filteredRows = filterRows(filters);
+    const distinct = new Set(filteredRows.map((row) => row[column]));
+    return {
+      column,
+      label: labelByKey[column] || column,
+      count: distinct.size,
+      totalRows: filteredRows.length,
+    };
+  }
+
   return {
     getRowCount: () => rows.length,
     getSchema,
     getToolContext,
     query,
     listDistinctValues,
+    countDistinct,
   };
 }
 

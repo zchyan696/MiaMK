@@ -27,7 +27,9 @@ function createChatService({ datasetService }) {
       'Responda sempre em portugues do Brasil com personalidade: direta, perspicaz, como um bom analista de mercado.',
       'CONCEITO FUNDAMENTAL: cada linha da base e um PONTO DE MIDIA (uma tela, outdoor ou painel fisico). Um EXIBIDOR e uma empresa que opera varios pontos. Nunca confunda pontos com exibidores.',
       'Ao responder, sempre use "pontos de midia" ou "ativos" para se referir a registros — nunca "exibidores" no lugar de contagem.',
-      'SEMPRE chame query_base antes de responder. Nunca invente numeros.',
+      'SEMPRE chame uma ferramenta antes de responder. Nunca invente numeros.',
+      'Para perguntas como "quantas cidades", "quantos exibidores distintos", "em quantos estados": use count_distinct.',
+      'Para rankings, distribuicoes ou valores agregados: use query_base com groupBy e limit adequado.',
       'Filtros sao case-insensitive: use o valor como o usuario digitou.',
       'Para rankings de exibidores em uma cidade: groupBy=["exibidor"], sort desc, limit 10.',
       'Interprete os dados: destaque o que e surpreendente, relevante ou estrategico. Responda em 3 a 5 frases naturais.',
@@ -57,6 +59,32 @@ function createChatService({ datasetService }) {
     const chatMessages = buildMessages(messages, toolContext);
 
     const tools = [
+      {
+        type: 'function',
+        function: {
+          name: 'count_distinct',
+          description: 'Conta quantos valores distintos existem em uma coluna, com filtros opcionais. Use para perguntas como "em quantas cidades temos midia?", "quantos exibidores distintos?", "em quantos estados?". Retorna o numero exato sem limitacao de paginacao.',
+          parameters: {
+            type: 'object',
+            properties: {
+              column: { type: 'string', description: 'Nome da coluna para contar valores distintos (ex: cidade, estado, exibidor).' },
+              filters: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    column: { type: 'string' },
+                    operator: { type: 'string' },
+                    value: { oneOf: [{ type: 'string' }, { type: 'number' }, { type: 'array', items: { oneOf: [{ type: 'string' }, { type: 'number' }] } }] },
+                  },
+                  required: ['column', 'operator'],
+                },
+              },
+            },
+            required: ['column'],
+          },
+        },
+      },
       {
         type: 'function',
         function: {
@@ -97,13 +125,6 @@ function createChatService({ datasetService }) {
               limit: {
                 type: 'number',
               },
-              sort: {
-                type: 'object',
-                properties: {
-                  by: { type: 'string' },
-                  direction: { type: 'string', enum: ['asc', 'desc'] },
-                },
-              },
               select: {
                 type: 'array',
                 items: { type: 'string' },
@@ -141,6 +162,9 @@ function createChatService({ datasetService }) {
         if (toolCall.function.name === 'query_base') {
           result = datasetService.query(args);
           lastQueryResult = result;
+        } else if (toolCall.function.name === 'count_distinct') {
+          result = datasetService.countDistinct(args);
+          lastDistinctResult = result;
         } else if (toolCall.function.name === 'list_distinct_values') {
           result = datasetService.listDistinctValues(args);
           lastDistinctResult = result;
@@ -171,7 +195,7 @@ function createChatService({ datasetService }) {
       console.log('[chat] modelo nao usou ferramenta — forcando retry');
       chatMessages.push({
         role: 'user',
-        content: 'Voce precisa chamar query_base para responder com dados reais. Chame a ferramenta agora.',
+        content: 'Voce precisa chamar uma ferramenta (query_base ou count_distinct) para responder com dados reais. Chame a ferramenta agora.',
       });
 
       response = await client.chat.completions.create({
@@ -195,6 +219,9 @@ function createChatService({ datasetService }) {
           if (toolCall.function.name === 'query_base') {
             result = datasetService.query(args);
             lastQueryResult = result;
+          } else if (toolCall.function.name === 'count_distinct') {
+            result = datasetService.countDistinct(args);
+            lastDistinctResult = result;
           } else {
             result = { error: `Ferramenta desconhecida: ${toolCall.function.name}` };
           }

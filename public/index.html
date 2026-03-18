@@ -28,66 +28,78 @@
           </div>
 
           <form id="query-form" class="filters-grid">
-            <label class="field">
-              <span>Estado</span>
-              <select id="estado"></select>
-            </label>
-            <label class="field">
-              <span>Cidade</span>
-              <select id="cidade"></select>
-            </label>
-            <label class="field">
-              <span>Exibidor</span>
-              <select id="exibidor"></select>
-            </label>
-            <label class="field">
-              <span>Tipo</span>
-              <select id="tipo"></select>
-            </label>
-            <label class="field">
-              <span>Tipo de mídia</span>
-              <select id="tipo-de-midia"></select>
-            </label>
-            <label class="field">
-              <span>Vertical</span>
-              <select id="vertical"></select>
-            </label>
-            <label class="field">
-              <span>Exposição</span>
-              <select id="tipo-de-exposicao"></select>
-            </label>
-            <label class="field">
-              <span>Agrupar por</span>
-              <select id="group-by">
-                <option value="">Sem agrupamento</option>
-                <option value="estado">Estado</option>
-                <option value="cidade">Cidade</option>
-                <option value="exibidor">Exibidor</option>
-                <option value="tipo">Tipo</option>
-                <option value="tipo_de_midia">Tipo de mídia</option>
-                <option value="vertical">Vertical</option>
-                <option value="tipo_de_exposicao">Tipo de exposição</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Métrica</span>
-              <select id="metric">
-                <option value="count">Contagem</option>
-                <option value="sum">Soma do fluxo</option>
-                <option value="avg">Média do fluxo</option>
-                <option value="max">Maior fluxo</option>
-                <option value="min">Menor fluxo</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Limite</span>
-              <select id="limit">
-                <option value="10">10</option>
-                <option value="20" selected>20</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
-            </label>
+            <div class="filter-group">
+              <div class="filter-group-label">Localização</div>
+              <label class="field">
+                <span>Estado</span>
+                <select id="estado"></select>
+              </label>
+              <label class="field">
+                <span>Cidade</span>
+                <select id="cidade"></select>
+              </label>
+            </div>
+
+            <div class="filter-group">
+              <div class="filter-group-label">Inventário</div>
+              <label class="field">
+                <span>Exibidor</span>
+                <select id="exibidor"></select>
+              </label>
+              <label class="field">
+                <span>Tipo</span>
+                <select id="tipo"></select>
+              </label>
+              <label class="field">
+                <span>Tipo de mídia</span>
+                <select id="tipo-de-midia"></select>
+              </label>
+              <label class="field">
+                <span>Vertical</span>
+                <select id="vertical"></select>
+              </label>
+              <label class="field">
+                <span>Exposição</span>
+                <select id="tipo-de-exposicao"></select>
+              </label>
+            </div>
+
+            <div class="filter-group">
+              <div class="filter-group-label">Configuração</div>
+              <label class="field">
+                <span>Agrupar por</span>
+                <select id="group-by">
+                  <option value="">Sem agrupamento</option>
+                  <option value="estado">Estado</option>
+                  <option value="cidade">Cidade</option>
+                  <option value="exibidor">Exibidor</option>
+                  <option value="tipo">Tipo</option>
+                  <option value="tipo_de_midia">Tipo de mídia</option>
+                  <option value="vertical">Vertical</option>
+                  <option value="tipo_de_exposicao">Tipo de exposição</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Métrica</span>
+                <select id="metric">
+                  <option value="count">Contagem</option>
+                  <option value="sum">Soma do fluxo</option>
+                  <option value="avg">Média do fluxo</option>
+                  <option value="max">Maior fluxo</option>
+                  <option value="min">Menor fluxo</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Limite</span>
+                <select id="limit">
+                  <option value="10">10</option>
+                  <option value="20" selected>20</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </label>
+            </div>
+
             <div class="rail-actions">
               <button id="reset-button" class="ghost-button" type="button">Limpar</button>
               <button id="run-query" class="primary-button" type="submit">Responder com este contexto</button>
