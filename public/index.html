@@ -3,167 +3,73 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Clone MIA</title>
+    <title>MiaMK</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/menu.css" />
   </head>
   <body>
-    <main class="app-shell">
-      <aside class="context-rail">
-        <section class="brand-card">
-          <p class="eyebrow">Clone MIA</p>
-          <h1>Conversas locais com a <span>Base tratada</span></h1>
-          <p class="lead">
-            Menos cara de sistema, mais cara de copiloto. Escolha um contexto, dispare uma pergunta guiada e veja a resposta entrar na conversa.
-          </p>
-          <div class="status-pill" id="status">Carregando base...</div>
-        </section>
+    <div class="app-wrapper">
 
-        <section class="filter-card">
-          <div class="section-head">
-            <p>Ajustar contexto</p>
-            <span>Refine a conversa antes de perguntar</span>
-          </div>
-
-          <form id="query-form" class="filters-grid">
-            <div class="filter-group">
-              <div class="filter-group-label">Localização</div>
-              <label class="field">
-                <span>Estado</span>
-                <select id="estado"></select>
-              </label>
-              <label class="field">
-                <span>Cidade</span>
-                <select id="cidade"></select>
-              </label>
-            </div>
-
-            <div class="filter-group">
-              <div class="filter-group-label">Inventário</div>
-              <label class="field">
-                <span>Exibidor</span>
-                <select id="exibidor"></select>
-              </label>
-              <label class="field">
-                <span>Tipo</span>
-                <select id="tipo"></select>
-              </label>
-              <label class="field">
-                <span>Tipo de mídia</span>
-                <select id="tipo-de-midia"></select>
-              </label>
-              <label class="field">
-                <span>Vertical</span>
-                <select id="vertical"></select>
-              </label>
-              <label class="field">
-                <span>Exposição</span>
-                <select id="tipo-de-exposicao"></select>
-              </label>
-            </div>
-
-            <div class="filter-group">
-              <div class="filter-group-label">Configuração</div>
-              <label class="field">
-                <span>Agrupar por</span>
-                <select id="group-by">
-                  <option value="">Sem agrupamento</option>
-                  <option value="estado">Estado</option>
-                  <option value="cidade">Cidade</option>
-                  <option value="exibidor">Exibidor</option>
-                  <option value="tipo">Tipo</option>
-                  <option value="tipo_de_midia">Tipo de mídia</option>
-                  <option value="vertical">Vertical</option>
-                  <option value="tipo_de_exposicao">Tipo de exposição</option>
-                </select>
-              </label>
-              <label class="field">
-                <span>Métrica</span>
-                <select id="metric">
-                  <option value="count">Contagem</option>
-                  <option value="sum">Soma do fluxo</option>
-                  <option value="avg">Média do fluxo</option>
-                  <option value="max">Maior fluxo</option>
-                  <option value="min">Menor fluxo</option>
-                </select>
-              </label>
-              <label class="field">
-                <span>Limite</span>
-                <select id="limit">
-                  <option value="10">10</option>
-                  <option value="20" selected>20</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-                </select>
-              </label>
-            </div>
-
-            <div id="quick-analysis" class="quick-analysis hidden">
-              <div class="quick-analysis-header">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                <span>Análise rápida</span>
-              </div>
-              <p id="quick-analysis-context" class="quick-analysis-context"></p>
-              <div id="quick-analysis-chips" class="quick-analysis-chips"></div>
-            </div>
-
-            <div class="rail-actions">
-              <button id="reset-button" class="ghost-button" type="button">Limpar</button>
-              <button id="run-query" class="primary-button" type="submit">Responder com este contexto</button>
-            </div>
-          </form>
-          <div class="extract-section">
-            <button id="extract-button" class="ghost-button extract-btn" type="button">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Extrair dados filtrados
-            </button>
-          </div>
-        </section>
-      </aside>
-
-      <section class="conversation-panel">
-        <header class="conversation-header">
-          <div class="header-left">
-            <button id="sidebar-toggle" class="icon-btn" title="Mostrar/ocultar filtros">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            </button>
-            <div class="model-info">
-              <div class="model-dot"></div>
-              <span class="model-name">Clone MIA</span>
-            </div>
-          </div>
-          <button id="new-chat-button" class="ghost-button" type="button">Nova conversa</button>
-          <button id="export-button" class="ghost-button export-button" type="button" disabled>Exportar CSV</button>
-        </header>
-
-        <section id="conversation-feed" class="conversation-feed">
-          <div class="intro-block">
-            <div class="intro-avatar">M</div>
-            <p class="intro-text">Olá! Sou o Clone MIA. Faça uma pergunta sobre a base de inventário ou escolha uma sugestão abaixo.</p>
-          </div>
-        </section>
-
-        <div class="chat-bottom">
-          <div class="question-grid" id="suggestions">
-            <button class="question-chip" data-preset="top-estados">Onde o inventário é mais denso?</button>
-            <button class="question-chip" data-preset="top-cidades-rj">Como o RJ se distribui por cidade?</button>
-            <button class="question-chip" data-preset="digitais-sp">Quem domina digital em SP?</button>
-            <button class="question-chip" data-preset="outdoors-rio">Quem lidera outdoor no Rio?</button>
-            <button class="question-chip" data-preset="verticais-df">Verticais no DF</button>
-            <button class="question-chip" data-preset="aeroportos-br">Aeroportos por estado</button>
-          </div>
-          <form id="chat-form" class="chat-bar">
-            <input id="chat-input" class="chat-input" type="text" placeholder="Pergunte sobre a base de inventário..." autocomplete="off" />
-            <button type="submit" class="chat-send">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            </button>
-          </form>
+      <!-- Navigation Rail -->
+      <nav class="app-nav">
+        <a href="/" class="nav-brand">M</a>
+        <div class="nav-items">
+          <a href="/" class="nav-item" id="nav-menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Início</span>
+          </a>
+          <a href="/consulta.html" class="nav-item" id="nav-consulta">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Consulta</span>
+          </a>
+          <a href="/plano-midia.html" class="nav-item" id="nav-plano-midia">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Plano</span>
+          </a>
         </div>
-      </section>
-    </main>
+      </nav>
 
-    <script src="/app.js"></script>
+      <!-- Menu content -->
+      <main class="menu-main">
+        <div class="menu-content">
+          <div class="menu-hero">
+            <span class="menu-eyebrow">MiaMK</span>
+            <h1 class="menu-title">Seu copiloto de <span>mídia OOH</span></h1>
+            <p class="menu-subtitle">Consulte o inventário Spotifinder ou monte um plano de mídia com inteligência artificial. Escolha por onde começar.</p>
+          </div>
+
+          <div class="menu-cards">
+            <a href="/consulta.html" class="menu-card">
+              <div class="menu-card-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </div>
+              <div class="menu-card-title">Consulta</div>
+              <p class="menu-card-desc">Explore o inventário Spotifinder com filtros em cascata, rankings e análises. Faça perguntas em linguagem natural e obtenha insights diretos da base de dados.</p>
+              <div class="menu-card-cta">
+                Abrir Consulta
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </div>
+            </a>
+
+            <a href="/plano-midia.html" class="menu-card">
+              <div class="menu-card-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </div>
+              <div class="menu-card-title">Plano de Mídia</div>
+              <p class="menu-card-desc">Envie arquivos, defina objetivos e deixe a IA montar seu plano de mídia. Inteligência aplicada ao planejamento OOH com foco em resultado.</p>
+              <div class="menu-card-cta">
+                Abrir Plano de Mídia
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </div>
+            </a>
+          </div>
+        </div>
+      </main>
+
+    </div>
+    <script src="/js/shared.js"></script>
   </body>
 </html>

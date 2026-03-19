@@ -1,0 +1,84 @@
+/* ── Plano de Mídia shell ───────────────────────────── */
+
+.pm-shell {
+  flex: 1;
+  min-width: 0;
+  height: 100vh;
+}
+
+.pm-panel {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+/* ── Upload button ─────────────────────────────────── */
+
+.upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  color: var(--ink-3);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 120ms, color 120ms;
+}
+
+.upload-btn:hover {
+  background: var(--surface-3);
+  color: var(--ink);
+}
+
+/* ── File list ─────────────────────────────────────── */
+
+.file-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 8px;
+}
+
+.file-list:empty {
+  display: none;
+}
+
+.file-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-2);
+  max-width: 260px;
+}
+
+.file-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-chip-remove {
+  background: none;
+  border: none;
+  color: var(--ink-3);
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 2px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 120ms;
+}
+
+.file-chip-remove:hover {
+  color: var(--ink);
+}

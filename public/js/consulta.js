@@ -1,3 +1,5 @@
+// formatValue, createMessage, createTypingIndicator vêm de shared.js
+
 const statusEl = document.getElementById('status');
 const formEl = document.getElementById('query-form');
 const feedEl = document.getElementById('conversation-feed');
@@ -44,7 +46,7 @@ async function refreshDownstream(changedKey) {
 
   await Promise.all(downstream.map(async (key) => {
     try {
-      const response = await fetch('/api/filtered-options', {
+      const response = await fetch('/api/consulta/filtered-options', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ column: key, filters }),
@@ -72,34 +74,6 @@ function fillSelect(select, values, placeholder) {
     option.textContent = `${item.value} (${item.count})`;
     select.appendChild(option);
   }
-}
-
-function formatValue(value) {
-  if (typeof value === 'number' && Number.isFinite(value)) {
-    return value.toLocaleString('pt-BR');
-  }
-  return value ?? '';
-}
-
-function createMessage(role, _title, content) {
-  const article = document.createElement('article');
-  article.className = `message ${role}`;
-
-  const avatar = document.createElement('div');
-  avatar.className = 'message-avatar';
-  avatar.textContent = role === 'user' ? 'Y' : 'M';
-  article.appendChild(avatar);
-
-  const messageContent = document.createElement('div');
-  messageContent.className = 'message-content';
-
-  const body = document.createElement('div');
-  body.className = 'message-body';
-  body.textContent = content;
-  messageContent.appendChild(body);
-
-  article.appendChild(messageContent);
-  return article;
 }
 
 function createSummaryBlock(result, queryParams) {
@@ -194,9 +168,7 @@ function createSummaryBlock(result, queryParams) {
 }
 
 function buildPromptText(meta = {}) {
-  if (meta.prompt) {
-    return meta.prompt;
-  }
+  if (meta.prompt) return meta.prompt;
 
   const parts = [];
   const filters = [
@@ -210,9 +182,7 @@ function buildPromptText(meta = {}) {
   ];
 
   for (const [key, label] of filters) {
-    if (selects[key].value) {
-      parts.push(`${label}: ${selects[key].value}`);
-    }
+    if (selects[key].value) parts.push(`${label}: ${selects[key].value}`);
   }
 
   const groupBy = selects.groupBy.value ? `agrupado por ${selects.groupBy.options[selects.groupBy.selectedIndex].text}` : 'sem agrupamento';
@@ -228,14 +198,8 @@ function buildResultText(result) {
   const grouped = result.presentation.summary.mode === 'grouped';
   const aggregate = result.presentation.summary.aggregate;
 
-  if (grouped) {
-    return `Encontrei ${formatValue(matched)} registros e organizei a resposta em ranking.`;
-  }
-
-  if (aggregate !== null && aggregate !== undefined) {
-    return `Encontrei ${formatValue(matched)} registros. O agregado pedido retorna ${formatValue(aggregate)}.`;
-  }
-
+  if (grouped) return `Encontrei ${formatValue(matched)} registros e organizei a resposta em ranking.`;
+  if (aggregate !== null && aggregate !== undefined) return `Encontrei ${formatValue(matched)} registros. O agregado pedido retorna ${formatValue(aggregate)}.`;
   return `Encontrei ${formatValue(matched)} registros com esse contexto.`;
 }
 
@@ -253,9 +217,7 @@ function buildQueryPayload() {
 
   for (const [id, column] of map) {
     const value = selects[id].value;
-    if (value) {
-      filters.push({ column, operator: 'eq', value });
-    }
+    if (value) filters.push({ column, operator: 'eq', value });
   }
 
   return {
@@ -361,28 +323,6 @@ function createClarificationBlock(clarification) {
   return block;
 }
 
-function createTypingIndicator() {
-  const article = document.createElement('article');
-  article.className = 'message assistant';
-  article.id = 'typing-indicator';
-
-  const avatar = document.createElement('div');
-  avatar.className = 'message-avatar';
-  avatar.textContent = 'M';
-  article.appendChild(avatar);
-
-  const messageContent = document.createElement('div');
-  messageContent.className = 'message-content';
-
-  const body = document.createElement('div');
-  body.className = 'message-body typing-dots';
-  body.textContent = 'Pensando...';
-  messageContent.appendChild(body);
-
-  article.appendChild(messageContent);
-  return article;
-}
-
 async function sendChat(text) {
   chatHistory.push({ role: 'user', content: text });
 
@@ -395,7 +335,7 @@ async function sendChat(text) {
   chatInputEl.disabled = true;
 
   try {
-    const response = await fetch('/api/chat', {
+    const response = await fetch('/api/consulta/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages: chatHistory }),
@@ -436,16 +376,14 @@ async function runQuery(meta = {}) {
   const userMessage = createMessage('user', 'Você perguntou', buildPromptText(meta));
   feedEl.appendChild(userMessage);
 
-  const response = await fetch('/api/query', {
+  const response = await fetch('/api/consulta/query', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
 
   const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.error || 'Falha ao consultar a base.');
-  }
+  if (!response.ok) throw new Error(data.error || 'Falha ao consultar a base.');
 
   lastTable = data.presentation.table;
   exportButtonEl.disabled = false;
@@ -462,7 +400,7 @@ async function exportTableXlsx(table, btn) {
   btn.disabled = true;
   btn.textContent = 'Gerando arquivo...';
   try {
-    const response = await fetch('/api/export-table-xlsx', {
+    const response = await fetch('/api/consulta/export-table-xlsx', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ table }),
@@ -493,7 +431,7 @@ async function exportXlsx(queryParams, btn) {
   btn.disabled = true;
   btn.textContent = 'Gerando arquivo...';
   try {
-    const response = await fetch('/api/export-xlsx', {
+    const response = await fetch('/api/consulta/export-xlsx', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query: queryParams }),
@@ -520,11 +458,9 @@ async function exportXlsx(queryParams, btn) {
 }
 
 async function exportCsv() {
-  if (!lastTable) {
-    return;
-  }
+  if (!lastTable) return;
 
-  const response = await fetch('/api/export', {
+  const response = await fetch('/api/consulta/export', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ table: lastTable }),
@@ -547,9 +483,7 @@ async function exportCsv() {
 }
 
 function resetFilters() {
-  Object.values(selects).forEach((select) => {
-    select.value = '';
-  });
+  Object.values(selects).forEach((select) => { select.value = ''; });
   selects.metric.value = 'count';
   selects.limit.value = '20';
 }
@@ -589,7 +523,7 @@ function applyPreset(name) {
 }
 
 async function loadOptions() {
-  const [healthResponse, optionsResponse] = await Promise.all([fetch('/api/health'), fetch('/api/options')]);
+  const [healthResponse, optionsResponse] = await Promise.all([fetch('/api/health'), fetch('/api/consulta/options')]);
   const health = await healthResponse.json();
   const options = await optionsResponse.json();
 
@@ -603,13 +537,11 @@ async function loadOptions() {
   fillSelect(selects.tipo_de_exposicao, options.exposicoes, 'Todas as exposições');
 }
 
+// ── Event listeners ──────────────────────────────────────────────────────────
+
 formEl.addEventListener('submit', async (event) => {
   event.preventDefault();
-  try {
-    await runQuery();
-  } catch (error) {
-    alert(error.message);
-  }
+  try { await runQuery(); } catch (error) { alert(error.message); }
 });
 
 resetButtonEl.addEventListener('click', () => {
@@ -618,11 +550,7 @@ resetButtonEl.addEventListener('click', () => {
 });
 
 exportButtonEl.addEventListener('click', async () => {
-  try {
-    await exportCsv();
-  } catch (error) {
-    alert(error.message);
-  }
+  try { await exportCsv(); } catch (error) { alert(error.message); }
 });
 
 for (const button of questionButtons) {
@@ -652,14 +580,21 @@ chatFormEl.addEventListener('submit', async (event) => {
   await sendChat(text);
 });
 
+document.getElementById('extract-button').addEventListener('click', async () => {
+  const btn = document.getElementById('extract-button');
+  await exportXlsx(buildQueryPayload(), btn);
+});
+
+// ── Quick Analysis ───────────────────────────────────────────────────────────
+
 const QUICK_ANALYSIS_OPTIONS = [
-  { key: 'exibidor',        label: 'Por Exibidor' },
-  { key: 'cidade',          label: 'Por Praça' },
-  { key: 'tipo_de_midia',   label: 'Por Tipo de Mídia' },
-  { key: 'tipo',            label: 'Por Formato' },
-  { key: 'vertical',        label: 'Por Vertical' },
+  { key: 'exibidor',          label: 'Por Exibidor' },
+  { key: 'cidade',            label: 'Por Praça' },
+  { key: 'tipo_de_midia',     label: 'Por Tipo de Mídia' },
+  { key: 'tipo',              label: 'Por Formato' },
+  { key: 'vertical',          label: 'Por Vertical' },
   { key: 'tipo_de_exposicao', label: 'Por Exposição' },
-  { key: 'estado',          label: 'Por Estado' },
+  { key: 'estado',            label: 'Por Estado' },
 ];
 
 function updateQuickAnalysis() {
@@ -671,18 +606,12 @@ function updateQuickAnalysis() {
     .filter((key) => selects[key]?.value)
     .map((key) => selects[key].value);
 
-  if (!activeFilters.length) {
-    qaEl.classList.add('hidden');
-    return;
-  }
+  if (!activeFilters.length) { qaEl.classList.add('hidden'); return; }
 
   const filteredKeys = new Set(CASCADE_ORDER.filter((k) => selects[k]?.value));
   const options = QUICK_ANALYSIS_OPTIONS.filter((o) => !filteredKeys.has(o.key));
 
-  if (!options.length) {
-    qaEl.classList.add('hidden');
-    return;
-  }
+  if (!options.length) { qaEl.classList.add('hidden'); return; }
 
   ctxEl.textContent = activeFilters.join(' · ');
   chipsEl.innerHTML = '';
@@ -710,81 +639,6 @@ for (const key of CASCADE_ORDER) {
   });
 }
 
-document.getElementById('extract-button').addEventListener('click', async () => {
-  const btn = document.getElementById('extract-button');
-  await exportXlsx(buildQueryPayload(), btn);
-});
-
 loadOptions().catch(() => {
   statusEl.textContent = 'Nao foi possivel carregar a base local.';
-});
-
-// ── Navigation ───────────────────────────────────────────────────────────────
-
-document.querySelectorAll('.nav-item').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.nav-item').forEach((b) => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.view').forEach((v) => v.classList.add('hidden'));
-    document.getElementById(`view-${btn.dataset.view}`).classList.remove('hidden');
-  });
-});
-
-// ── Plano de Mídia ───────────────────────────────────────────────────────────
-
-const pmFeedEl = document.getElementById('pm-feed');
-const pmChatFormEl = document.getElementById('pm-chat-form');
-const pmChatInputEl = document.getElementById('pm-chat-input');
-const pmFileInputEl = document.getElementById('pm-file-input');
-const pmFileListEl = document.getElementById('pm-file-list');
-
-let pmAttachedFiles = [];
-
-pmFileInputEl.addEventListener('change', () => {
-  const incoming = Array.from(pmFileInputEl.files);
-  for (const f of incoming) {
-    if (!pmAttachedFiles.some((existing) => existing.name === f.name)) {
-      pmAttachedFiles.push(f);
-    }
-  }
-  pmFileInputEl.value = '';
-  renderPmFileList();
-});
-
-function renderPmFileList() {
-  pmFileListEl.innerHTML = '';
-  for (const file of pmAttachedFiles) {
-    const chip = document.createElement('div');
-    chip.className = 'file-chip';
-    chip.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>${file.name}</span><button class="file-chip-remove" type="button">×</button>`;
-    chip.querySelector('.file-chip-remove').addEventListener('click', () => {
-      pmAttachedFiles = pmAttachedFiles.filter((f) => f.name !== file.name);
-      renderPmFileList();
-    });
-    pmFileListEl.appendChild(chip);
-  }
-}
-
-pmChatFormEl.addEventListener('submit', (event) => {
-  event.preventDefault();
-  const text = pmChatInputEl.value.trim();
-  if (!text && pmAttachedFiles.length === 0) return;
-
-  const displayText = text || `${pmAttachedFiles.length} arquivo(s) anexado(s)`;
-  pmFeedEl.appendChild(createMessage('user', 'Você', displayText));
-  pmFeedEl.scrollTop = pmFeedEl.scrollHeight;
-
-  pmChatInputEl.value = '';
-  pmAttachedFiles = [];
-  renderPmFileList();
-});
-
-document.getElementById('pm-new-chat').addEventListener('click', () => {
-  pmAttachedFiles = [];
-  renderPmFileList();
-  pmFeedEl.innerHTML = '';
-  const intro = document.createElement('div');
-  intro.className = 'intro-block';
-  intro.innerHTML = '<div class="intro-avatar">M</div><p class="intro-text">Olá! Envie arquivos e descreva o que precisa para montar seu plano de mídia.</p>';
-  pmFeedEl.appendChild(intro);
 });
